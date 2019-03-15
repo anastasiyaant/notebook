@@ -2,103 +2,106 @@ import java.util.Date;
 
 public class Notebook {
    private Note[] notes;
-   private int notebook_size = 10;
-   private int expand_size = 10;
-   private int notes_count;
+   private static final int SIZE=10;
+   private int notebookSize;
+   private int expandSize;
+   private int notesCount;
 
-   public Notebook()
-   {
-       notes = new Note[notebook_size];
-       notes_count=0;
+   public Notebook() {
+       notebookSize = SIZE;
+       notes = new Note[notebookSize];
+       notesCount=0;
+       expandSize = SIZE;
    }
 
-   public void addNote(Date date, String header, String text)
-   {
-       //System.out.println("Adding");
-       if (notes_count+1>=notebook_size)
-       {
+   public void addNote(Date date, String header, String text) {
+       if (notesCount+1>=notebookSize) {
            expandNotebook();
        }
-
-       if (date!=null) {
-           notes[notes_count] = new Note(date, header, text);
-       } else
-       {
-           notes[notes_count] = new Note(new Date(), header, text);
-       }
-       notes_count++;
+       notes[notesCount] = new Note(date!=null ? date : new Date(), header, text);
+       notesCount++;
    }
 
-   public void delNote(int note_num)
-   {
-       if ((note_num<=notes_count)&&(note_num>0)) {
-           note_num--;
-           for (int i = note_num; i < notes_count - 1; i++) {
+   public void deleteNote(int noteNum) {
+       if (noteNum<=notesCount&&noteNum>0) {
+           noteNum--;
+           for (int i = noteNum; i < notesCount - 1; i++) {
                notes[i] = notes[i + 1];
            }
-           notes[notes_count - 1]=null;
-           notes_count--;
-           if (notebook_size - notes_count > (expand_size+(expand_size/2))) {
+           notesCount--;
+           notes[notesCount]=null;
+           if (notebookSize - notesCount > (expandSize+(expandSize/2))) {
                reduceNotebook();
            }
        }
-   }
-
-   public void editNote(int note_num, String header, String text, Date date)
-   {
-       if ((note_num<=notes_count)&&(note_num>0))
-       {
-           if (date != null) {
-               notes[note_num - 1].setDate(date);
-           }
-           notes[note_num - 1].setHeader(header);
-           notes[note_num - 1].setText(text);
+       else {
+           System.out.printf("Unable to delete! Note with number %d doesn't exist!\n", noteNum);
        }
    }
 
-   public void showNotebook()
-   {
-       if (notes_count==0)
-       {
-           System.out.println("Notebook is empty:(");
+   public void editNote(int noteNum, String header, String text, Date date) {
+       if (noteNum<=notesCount&&noteNum>0) {
+           if (date != null) {
+               notes[noteNum - 1].setDate(date);
+           }
+           notes[noteNum - 1].setHeader(header);
+           notes[noteNum - 1].setText(text);
+       }
+       else {
+           System.out.printf("Unable to edit! Note with number %d doesn't exist!\n", noteNum);
+       }
+   }
+    public void editNote(int noteNum, String header, String text) {
+        if (noteNum<=notesCount&&noteNum>0) {
+            notes[noteNum - 1].setHeader(header);
+            notes[noteNum - 1].setText(text);
+        }
+        else {
+            System.out.printf("Unable to edit! Note with number %d doesn't exist!\n", noteNum);
+        }
+    }
+
+    public void editNote(int noteNum, String header) {
+        if (noteNum<=notesCount&&noteNum>0) {
+            notes[noteNum - 1].setHeader(header);
+        }
+        else {
+            System.out.printf("Unable to edit! Note with number %d doesn't exist!\n", noteNum);
+        }
+    }
+
+
+   public void showNotebook() {
+       if (notesCount==0) {
+           System.out.println("Notebook is empty:(\n");
        }else {
-           for (int i = 0; i < notes_count; i++) {
+           for (int i = 0; i < notesCount; i++) {
                System.out.println(i + 1);
-               System.out.println(notes[i].showDate());
-               System.out.println(notes[i].showHeader());
-               System.out.println(notes[i].showText());
+               System.out.println(notes[i].getDate());
+               System.out.println(notes[i].getHeader());
+               System.out.println(notes[i].getText());
                System.out.println();
            }
        }
    }
 
-   private void  expandNotebook()
-   {
-       //System.out.println("Expanding...");
-       Note[] newNotebook= new Note[notebook_size+expand_size];
-       for (int i=0; i<notes_count; i++)
-       {
+   private void  expandNotebook() {
+       Note[] newNotebook= new Note[notebookSize+expandSize];
+       cloneNotebook(newNotebook);
+       notebookSize+=expandSize;
+   }
+
+    private void  reduceNotebook() {
+        Note[] newNotebook= new Note[notebookSize-expandSize];
+        cloneNotebook(newNotebook);
+        notebookSize-=expandSize;
+    }
+
+    private void cloneNotebook(Note[] newNotebook){
+       for (int i=0; i<notesCount; i++) {
            newNotebook[i]=notes[i];
        }
        notes=newNotebook;
-       notebook_size+=expand_size;
-   }
-
-    private void  reduceNotebook()
-    {
-        //System.out.println("Reducing..");
-        Note[] newNotebook= new Note[notebook_size-expand_size];
-        for (int i=0; i<notes_count; i++)
-        {
-            newNotebook[i]=notes[i];
-        }
-        notes=newNotebook;
-        notebook_size-=expand_size;
     }
-
-
-
-
-
 
 }
